@@ -5,7 +5,7 @@ module.exports = class ZeroRouter {
 
   constructor() {
     /** @type {import('zero-annotation/src/DefaultPluginManager')} */
-    this.manager = Parser.createPluginManager('controller', {
+    this.manager = this.parser.createPluginManager('controller', {
       main: ['id', 'pattern'],
       fields: {
         pattern: 'pattern',
@@ -23,11 +23,15 @@ module.exports = class ZeroRouter {
     });
     this._controllers = null;
 
-    Parser.handler.on('plugins.controller', ({ definitions }) => {
+    this.parser.handler.on('plugins.controller', ({ definitions }) => {
       for (const definition of definitions) {
         this.addDefinition(definition);
       }
     });
+  }
+
+  get parser() {
+    return Parser;
   }
 
   get controllers() {
@@ -59,10 +63,10 @@ module.exports = class ZeroRouter {
       const controller = this.manager.get(info.controller.definition);
 
       if (info.controller.route.prepare) {
-        await Parser.call(info.controller.definition, info.controller.route.prepare, serve);
+        await this.parser.call(info.controller.definition, info.controller.route.prepare, serve);
       }
       if (info.controller.route.access) {
-        const value = await Parser.call(info.controller.definition, info.controller.route.access, serve);
+        const value = await this.parser.call(info.controller.definition, info.controller.route.access, serve);
         if (typeof value === 'string') {
           return serve.RESPONSE.errorForbidden(value).send();
         } else if (!value) {
