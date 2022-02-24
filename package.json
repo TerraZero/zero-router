@@ -1,0 +1,24 @@
+{
+  "name": "zero-router",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TerraZero/zero-router.git"
+  },
+  "author": "TerraZero",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TerraZero/zero-router/issues"
+  },
+  "homepage": "https://github.com/TerraZero/zero-router#readme",
+  "dependencies": {
+    "@types/node": "^17.0.19",
+    "url-pattern": "^1.0.3",
+    "zero-annotation": "git+https://github.com/TerraZero/zero-annotation.git"
+  }
+}
