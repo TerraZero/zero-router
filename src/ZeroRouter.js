@@ -9,6 +9,8 @@ module.exports = class ZeroRouter {
       main: ['id', 'pattern'],
       fields: {
         pattern: 'pattern',
+        access: 'access',
+        prepare: 'prepare',
       },
       methods: {
         route: {
@@ -62,24 +64,16 @@ module.exports = class ZeroRouter {
       serve.setInfo(info);
       const controller = this.manager.get(info.controller.definition);
 
-      if (info.controller.route.prepare) {
-        let prepare = info.controller.route.prepare;
-        if (!Array.isArray(prepare)) prepare = [prepare];
-        for (const callback of prepare) {
-          await this.parser.call(info.controller.definition, callback, serve);
-        }
+      for (const callback of info.controller.prepare) {
+        await this.parser.call(info.controller.definition, callback, serve);
       }
 
-      if (info.controller.route.access) {
-        let access = info.controller.route.access;
-        if (!Array.isArray(access)) access = [access];
-        for (const callback of access) {
-          const value = await this.parser.call(info.controller.definition, callback, serve);
-          if (typeof value === 'string') {
-            return serve.RESPONSE.errorForbidden(value).send();
-          } else if (!value) {
-            return serve.RESPONSE.errorForbidden().send();
-          }
+      for (const callback of info.controller.access) {
+        const value = await this.parser.call(info.controller.definition, callback, serve);
+        if (typeof value === 'string') {
+          return serve.RESPONSE.errorForbidden(value).send();
+        } else if (!value) {
+          return serve.RESPONSE.errorForbidden().send();
         }
       }
       
@@ -115,8 +109,20 @@ module.exports = class ZeroRouter {
         definition: definition,
         route: route,
         url: definition.pattern + route.pattern,
+        prepare: this.getDefinitionField('prepare', definition, route),
+        access: this.getDefinitionField('access', definition, route),
       });
     }
+  }
+
+  getDefinitionField(field, ...definitions) {
+    const values = [];
+    for (const definition of definitions) {
+      if (!definition[field]) continue;
+      (Array.isArray(definition[field]) ? definition[field] : [definition[field]])
+        .forEach(v => values.push(v));
+    }
+    return values;
   }
 
 }
