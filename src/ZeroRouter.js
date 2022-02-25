@@ -63,17 +63,18 @@ module.exports = class ZeroRouter {
       const controller = this.manager.get(info.controller.definition);
 
       if (info.controller.route.prepare) {
-        await this.parser.call(info.controller.definition, info.controller.route.prepare, serve);
-      }
-      if (info.controller.route.access) {
-        let accesses = [];
-        if (Array.isArray(info.controller.route.access)) {
-          accesses = info.controller.route.access;
-        } else {
-          accesses = [info.controller.route.access];
+        let prepare = info.controller.route.prepare;
+        if (!Array.isArray(prepare)) prepare = [prepare];
+        for (const callback of prepare) {
+          await this.parser.call(info.controller.definition, callback, serve);
         }
-        for (const access of accesses) {
-          const value = await this.parser.call(info.controller.definition, access, serve);
+      }
+
+      if (info.controller.route.access) {
+        let access = info.controller.route.access;
+        if (!Array.isArray(access)) access = [access];
+        for (const callback of access) {
+          const value = await this.parser.call(info.controller.definition, callback, serve);
           if (typeof value === 'string') {
             return serve.RESPONSE.errorForbidden(value).send();
           } else if (!value) {
@@ -81,6 +82,7 @@ module.exports = class ZeroRouter {
           }
         }
       }
+      
       try {
         await controller[info.controller.route._method.name](serve);
         if (!serve.sended) serve.send();
