@@ -15,6 +15,8 @@ module.exports = class ResponseCollection {
   setCode(code, ...args) {
     if (code === 200) {
       this.serve.meta('status', 200);
+    } else if (code === 400) {
+      this.serve.error(400, (args[0] ? '[Bad Request]: ' + args[0] : 'Bad Request'));
     } else if (code === 403) {
       this.serve.error(403, (args[0] ? '[Forbidden]: ' + args[0] : 'Forbidden'));
     } else if (code === 404) {
@@ -34,6 +36,13 @@ module.exports = class ResponseCollection {
    */
   ok() {
     return this.setCode(200).serve;
+  }
+
+  /**
+   * @returns {import('./Serve')}
+   */
+  errorBadRequest(message = null) {
+    return this.setCode(400, message).serve;
   }
 
   /**

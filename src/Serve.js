@@ -24,6 +24,67 @@ module.exports = class Serve {
     this._response_collection = null;
   }
 
+  /**
+   * @param {(string|number)} value 
+   * @param {*} fallback 
+   * @returns {number}
+   */
+  float(value, fallback = null) {
+    if (typeof value === 'number') return value;
+    if (parseFloat(value) + '' === value) return parseFloat(value);
+    return fallback;
+  }
+
+  /**
+   * @param {(string|number)} value 
+   * @param {*} fallback 
+   * @returns {number}
+   */
+  int(value, fallback = null) {
+    if (typeof value === 'number') return value;
+    if (parseInt(value) + '' === value) return parseInt(value);
+    return fallback;
+  }
+
+  /**
+   * @param {(string|number|boolean)} value 
+   * @param {*} fallback 
+   * @returns {boolean}
+   */
+  bool(value, fallback = null) {
+    if (value === 'true' || value === true) return true;
+    if (value === 'false' || value === false) return false;
+    return fallback;
+  }
+
+  /**
+   * @param {(Object|string|number|boolean)} value
+   * @param {*} fallback
+   * @returns {Object}
+   */
+  object(value) {
+    if (typeof value === 'string') {
+      try {
+        return JSON.parse(value + '');
+      } catch (e) {}
+    }
+    return value;
+  }
+
+  /**
+   * @param {(Object|string|number|boolean)} value
+   * @param {*} fallback
+   * @returns {*}
+   */
+  val(value, fallback = null) {
+    let data = this.bool(value);
+    if (data === null) data = this.float(value);
+    if (data === null) data = this.int(value);
+    if (data === null) data = this.object(value);
+    if (data === null) data = fallback;
+    return data;
+  }
+
   get RESPONSE() {
     if (this._response_collection === null) {
       this._response_collection = new ResponseCollection(this);

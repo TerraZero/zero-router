@@ -1,6 +1,9 @@
 const Parser = require('zero-annotation');
 const Pattern = require('url-pattern');
 
+/**
+ * @service (router)
+ */
 module.exports = class ZeroRouter {
 
   constructor() {
