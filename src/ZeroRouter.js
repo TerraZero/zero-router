@@ -1,5 +1,6 @@
 const Parser = require('zero-annotation');
 const Pattern = require('url-pattern');
+const ZeroResponse = require('./ZeroResponse');
 
 /**
  * @service (router)
@@ -73,12 +74,17 @@ module.exports = class ZeroRouter {
       }
 
       for (const callback of info.controller.prepare) {
-        await this.parser.call(info.controller.definition, callback, serve);
+        const result = await this.parser.call(info.controller.definition, callback, serve);
+        if (result instanceof ZeroResponse) {
+          return await result.execute(this);
+        }
       }
 
       for (const callback of info.controller.access) {
         const value = await this.parser.call(info.controller.definition, callback, serve);
-        if (typeof value === 'string') {
+        if (value instanceof ZeroResponse) {
+          return await value.execute(this);
+        } else if (typeof value === 'string') {
           return serve.RESPONSE.errorForbidden(value).send();
         } else if (!value) {
           return serve.RESPONSE.errorForbidden().send();
@@ -86,7 +92,10 @@ module.exports = class ZeroRouter {
       }
       
       try {
-        await controller[info.controller.route._method.name](serve);
+        const result = await controller[info.controller.route._method.name](serve);
+        if (result instanceof ZeroResponse) {
+          await result.execute(this);
+        }
         if (!serve.sended) serve.send();
       } catch (e) {
         serve._data = null;

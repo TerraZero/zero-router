@@ -4,10 +4,12 @@ const ResponseCollection = require('./ResponseCollection');
 module.exports = class Serve {
 
   /**
+   * @param {import('./ZeroRouter')} router
    * @param {import('http').ClientRequest} request 
    * @param {import('http').ServerResponse} response
    */
-  constructor(request, response) {
+  constructor(router, request, response) {
+    this.router = router;
     this.request = request;
     this.response = response;
     this.sended = false;
