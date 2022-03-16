@@ -95,17 +95,26 @@ module.exports = class ZeroRouter {
   }
 
   /**
-   * @param {import('./Serve')} serve 
+   * @param {import('./Serve')} serve
    * @param {string} route 
    * @param {Object} match
+   * @returns {import('./Serve')}
    */
   async setRedirect(serve, route, match = null) {
     if (match === null) match = serve.MATCH;
+    return this.setRedirectUrl(serve, this.getUrl(route, match));
+  }
+
+  /**
+   * @param {import('./Serve')} serve
+   * @param {string} url
+   * @returns {import('./Serve')}
+   */
+  async setRedirectUrl(serve, to) {
     const from = serve.url();
-    serve.request.url = this.getUrl(route, match);
-    const to = serve.url();
     serve.meta('redirect', { from, to }, true);
-    return await this.serve(serve);
+    serve.request.url = to;
+    return this.serve(serve);
   }
 
   /**
