@@ -22,6 +22,7 @@ module.exports = class ZeroRouter {
             pattern: 'pattern',
             access: 'access',
             prepare: 'prepare',
+            request: 'request',
           },
         },
       },
@@ -66,6 +67,10 @@ module.exports = class ZeroRouter {
 
       serve.setInfo(info);
       const controller = this.manager.get(info.controller.definition);
+
+      if (info.controller.request.length && !info.controller.request.includes(serve.getMethod())) {
+        return serve.RESPONSE.errorBadRequest('Not supported method "' + serve.getMethod() + '". Only methods "' + info.controller.request.join(', ') + '" allowed.').send();
+      }
 
       for (const callback of info.controller.prepare) {
         await this.parser.call(info.controller.definition, callback, serve);
@@ -137,6 +142,7 @@ module.exports = class ZeroRouter {
         url: definition.pattern + route.pattern,
         prepare: this.getDefinitionField('prepare', definition, route),
         access: this.getDefinitionField('access', definition, route),
+        request: this.getDefinitionField('request', definition, route),
       });
     }
   }

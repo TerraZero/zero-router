@@ -165,14 +165,21 @@ module.exports = class Serve {
     });
   }
 
+  /**
+   * @returns {string}
+   */
+  getMethod() {
+    return this.request.method;
+  }
+
   /** @returns {boolean} */
   isPOST() {
-    return this.request.method === 'POST';
+    return this.getMethod() === 'POST';
   }
 
   /** @returns {boolean} */
   isGET() {
-    return this.request.method === 'GET';
+    return this.getMethod() === 'GET';
   }
 
   /** @returns {Promise<string>} */
