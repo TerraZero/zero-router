@@ -76,17 +76,17 @@ module.exports = class ZeroRouter {
       for (const callback of info.controller.prepare) {
         const result = await this.parser.call(info.controller.definition, callback, serve);
         if (result instanceof ZeroResponse) {
-          return await result.execute(this);
+          return await result.doExecute();
         }
       }
 
       for (const callback of info.controller.access) {
         const value = await this.parser.call(info.controller.definition, callback, serve);
         if (value instanceof ZeroResponse) {
-          return await value.execute(this);
+          return await value.doExecute();
         } else if (typeof value === 'string') {
           return serve.RESPONSE.errorForbidden(value).send();
-        } else if (!value) {
+        } else if (!value && value !== undefined) {
           return serve.RESPONSE.errorForbidden().send();
         }
       }
@@ -94,7 +94,7 @@ module.exports = class ZeroRouter {
       try {
         const result = await controller[info.controller.route._method.name](serve);
         if (result instanceof ZeroResponse) {
-          await result.execute(this);
+          await result.doExecute();
         }
         if (!serve.sended) serve.send();
       } catch (e) {
