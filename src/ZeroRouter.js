@@ -95,6 +95,17 @@ module.exports = class ZeroRouter {
   }
 
   /**
+   * @param {import('./Serve')} serve 
+   * @param {string} route 
+   * @param {Object} match
+   */
+  async setRedirect(serve, route, match = null) {
+    if (match === null) match = serve.MATCH;
+    serve.request.url = this.getUrl(route, match);
+    return await this.serve(serve);
+  }
+
+  /**
    * @param {string} url 
    */
   getControllerDefinition(url) {
