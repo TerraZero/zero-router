@@ -104,7 +104,7 @@ module.exports = class ZeroRouter {
     const from = serve.url();
     serve.request.url = this.getUrl(route, match);
     const to = serve.url();
-    serve.meta('redirect', { from, to });
+    serve.meta('redirect', { from, to }, true);
     return await this.serve(serve);
   }
 
