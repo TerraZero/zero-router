@@ -121,8 +121,13 @@ module.exports = class Serve {
     return URL.parse(this.url(), true);
   }
 
-  meta(name, value) {
-    this._meta[name] = value;
+  meta(name, value, isArray = false) {
+    if (isArray) {
+      this._meta[name] = this._meta[name] || [];
+      this._meta[name].push(value);
+    } else {
+      this._meta[name] = value;
+    }
     return this;
   }
 

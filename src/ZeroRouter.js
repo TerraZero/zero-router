@@ -101,7 +101,10 @@ module.exports = class ZeroRouter {
    */
   async setRedirect(serve, route, match = null) {
     if (match === null) match = serve.MATCH;
+    const from = serve.url();
     serve.request.url = this.getUrl(route, match);
+    const to = serve.url();
+    serve.meta('redirect', { from, to });
     return await this.serve(serve);
   }
 
