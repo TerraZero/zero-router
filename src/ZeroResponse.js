@@ -11,7 +11,7 @@ module.exports = class ZeroResponse {
    * @returns {import('../Serve')}
    */
   async doExecute() {
-    this.execute();
+    await this.execute();
     if (!this.serve.sended) this.serve.send();
     return this.serve;
   }
