@@ -97,13 +97,13 @@ module.exports = class ZeroRouter {
           await result.doExecute();
         }
         if (!serve.sended) serve.send();
-      } catch (e) {
-        serve._data = null;
-        serve.RESPONSE.errorServiceUnavailable(e.message).send();
+      } catch (error) {
+        serve._data = { error: error.stack.split('\n').map(v => v.trim()) };
+        serve.RESPONSE.errorServiceUnavailable(error.message).send();
       }
-    } catch (e) {
-      serve._data = null;
-      serve.RESPONSE.errorInternalServerError(e.message).send();
+    } catch (error) {
+      serve._data = { error: error.stack.split('\n').map(v => v.trim()) };
+      serve.RESPONSE.errorInternalServerError(error.message).send();
     }
     return serve;
   }
